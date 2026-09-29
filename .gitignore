@@ -1,0 +1,21 @@
+# Raw data / archives
+data/raw/
+*.zip
+*.rar
+*.7z
+
+# Large generated outputs
+outputs/*.csv
+outputs/*.parquet
+outputs/*.feather
+
+# Python
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
