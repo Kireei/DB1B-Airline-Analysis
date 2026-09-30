@@ -8,6 +8,7 @@ This project is designed to practice how a data analyst works with large, real-w
 
 - understand table grain and business definitions
 - validate raw data before analysis
+- investigate suspicious values before deciding whether to clean or filter them
 - use PostgreSQL for large-scale SQL analysis
 - join multiple DB1B tables safely
 - use Pandas for deeper EDA and visualization
@@ -73,8 +74,9 @@ DB1B-Airline-Analysis/
 - [x] Inspect DB1BTicket schema with Pandas
 - [x] Load DB1BTicket 2024 Q1-Q4 into PostgreSQL
 - [x] Validate row distribution by quarter
-- [ ] Complete DB1BTicket data understanding
-- [ ] Complete DB1BTicket data validation
+- [x] Complete DB1BTicket data understanding
+- [x] Complete DB1BTicket data validation
+- [x] Complete DB1BTicket data-quality / cleaning investigation and analytical scope
 - [ ] Import and validate DB1BMarket
 - [ ] Import and validate DB1BCoupon
 - [ ] Define table relationships and join grain
@@ -83,6 +85,23 @@ DB1B-Airline-Analysis/
 - [ ] Continue analysis in Pandas
 - [ ] Create final visualizations
 - [ ] Write findings, limitations, and executive summary
+
+## Completed DB1BTicket validation findings
+
+The current 2024 DB1BTicket validation stage produced several important analytical notes:
+
+- **20,066,076 rows** were loaded across Q1-Q4.
+- The checked business columns contained **no SQL NULL values** and no negative values in the validated numeric fields.
+- **16,233 rows** have `itin_fare = 0`, approximately **0.0809%** of the dataset.
+- The same **16,233 rows** also have `fare_per_mile = 0` in the checked results.
+- **5,742 rows** have `miles_flown < 100`; the minimum observed value is 17 miles.
+- `distance` and `miles_flown` are equal for **19,612,790** rows, while **453,286** rows have `distance > miles_flown`.
+- Extreme `itin_fare` and `fare_per_mile` values are treated as investigation candidates, not automatically deleted as errors.
+- Binary flags checked in this stage use the expected 0/1 domain.
+
+### Analytical-scope decision
+
+The raw DB1BTicket table is preserved. Unusual records are documented rather than deleted without evidence. Downstream analysis can apply explicit filters when the metric requires a narrower population—for example, a paid-fare analysis can use `itin_fare > 0` while data-quality analysis retains all records.
 
 ## Analytical workflow
 
@@ -94,6 +113,8 @@ PostgreSQL raw tables
 Data understanding
     ↓
 Data validation
+    ↓
+Data-quality investigation & analytical scope
     ↓
 Relational JOIN analysis
     ↓
@@ -118,4 +139,4 @@ Raw data should be downloaded from the official BTS TranStats source. See `data/
 
 ## Portfolio note
 
-This repository intentionally emphasizes **reasoning and analytical workflow**, not only SQL syntax. SQL files will document the questions being answered, the grain used, validation logic, and limitations behind each result.
+This repository intentionally emphasizes **reasoning and analytical workflow**, not only SQL syntax. SQL files document the questions being answered, the grain used, validation logic, analytical scope, and limitations behind each result.
