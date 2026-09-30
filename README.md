@@ -77,10 +77,10 @@ DB1B-Airline-Analysis/
 - [x] Complete DB1BTicket data understanding
 - [x] Complete DB1BTicket data validation
 - [x] Complete DB1BTicket data-quality / cleaning investigation and analytical scope
+- [x] Complete DB1BTicket baseline analysis
 - [ ] Import and validate DB1BMarket
 - [ ] Import and validate DB1BCoupon
 - [ ] Define table relationships and join grain
-- [ ] Build baseline business analysis
 - [ ] Perform exploratory and diagnostic analysis
 - [ ] Continue analysis in Pandas
 - [ ] Create final visualizations
@@ -103,6 +103,20 @@ The current 2024 DB1BTicket validation stage produced several important analytic
 
 The raw DB1BTicket table is preserved. Unusual records are documented rather than deleted without evidence. Downstream analysis can apply explicit filters when the metric requires a narrower population—for example, a paid-fare analysis can use `itin_fare > 0` while data-quality analysis retains all records.
 
+## Completed baseline findings
+
+The DB1BTicket baseline analysis now provides a descriptive picture of the 2024 data:
+
+- **Q2** contains the largest share of itinerary records, at about **26.07%**.
+- **WN** has the largest itinerary count.
+- Among carriers with at least **200,000** itinerary records, **DL** has the highest average itinerary fare.
+- Round-trip itinerary records are more numerous and have higher average total fare and distance than one-way records, while their average fare per mile is slightly lower.
+- **2-coupon** itineraries form the largest coupon group, with about **10.60 million** records.
+- Average itinerary fare generally increases across higher distance groups, while average fare per mile generally decreases.
+- **CA** is the origin state with the largest itinerary count, at about **2.45 million** records.
+
+These are descriptive findings only. Later exploratory and diagnostic stages will investigate why these patterns appear and whether they remain stable under narrower analytical scopes.
+
 ## Analytical workflow
 
 ```text
@@ -116,11 +130,11 @@ Data validation
     ↓
 Data-quality investigation & analytical scope
     ↓
-Relational JOIN analysis
-    ↓
 Baseline business metrics
     ↓
 Exploratory / diagnostic analysis
+    ↓
+Relational JOIN analysis
     ↓
 Pandas EDA & visualization
     ↓
