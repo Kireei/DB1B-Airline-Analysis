@@ -16,9 +16,10 @@ Completed SQL stages:
 - Data validation / cleaning investigation
 - Baseline analysis
 - Exploratory analysis
+- Diagnostic analysis
 
 Next SQL stage:
-- Diagnostic analysis
+- Relational JOIN analysis
 
 Keep SQL readable and grouped by business question. Add comments explaining the
 purpose of each query, the grain of the result, relevant sample-size constraints,
