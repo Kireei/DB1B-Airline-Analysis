@@ -82,7 +82,7 @@ DB1B-Airline-Analysis/
 - [ ] Import and validate DB1BMarket
 - [ ] Import and validate DB1BCoupon
 - [ ] Define table relationships and join grain
-- [ ] Perform diagnostic analysis
+- [x] Complete DB1BTicket diagnostic analysis
 - [ ] Continue analysis in Pandas
 - [ ] Create final visualizations
 - [ ] Write findings, limitations, and executive summary
@@ -132,6 +132,21 @@ The exploratory stage tests whether baseline patterns remain visible after segme
 - Among `carrier × distance_group × round_trip` segments with at least **50,000** itineraries, **UA + distance group 11 + round-trip** has the highest observed average itinerary fare.
 
 These exploratory findings identify patterns for later diagnostic analysis. They do not by themselves establish causal explanations.
+
+## Completed diagnostic findings
+
+The diagnostic stage drills into selected exploratory patterns and tests plausible explanations while keeping causal claims separate from descriptive evidence:
+
+- Round-trip records show higher average coupon counts and fare-per-mile than one-way records within the same distance groups examined.
+- At high distance groups, one-way samples are much smaller than round-trip samples; in some groups, one-way fare-per-mile is also higher.
+- AK's high average itinerary fare appears alongside relatively high average distance and coupon counts in selected segments.
+- The decline in average fare-per-mile across higher distance groups remains visible across several carriers, quarters, and trip types.
+- Within matched distance groups, HA shows higher average fare-per-mile than G4 in the segments examined, while average distance does not always move in the same direction.
+- WN has the highest observed carrier share in the CA and TX state-quarter comparisons shown when share is calculated against all carriers in the same state-quarter.
+- Two-coupon itineraries are strongly represented in several high-volume segments, especially WN round-trip records in distance groups 2-4.
+- Within UA + distance group 11 + round-trip, high average fares are not uniform across subsegments; some of the highest values are concentrated in specific origins, especially NJ in the displayed output.
+
+These findings are diagnostic rather than causal: they identify factors and subsegments that may help explain the observed patterns, but they do not establish cause-and-effect relationships.
 
 ## Analytical workflow
 
