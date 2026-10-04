@@ -17,9 +17,10 @@ Completed SQL stages:
 - Baseline analysis
 - Exploratory analysis
 - Diagnostic analysis
-
-Next SQL stage:
 - Relational JOIN analysis
+
+Next stage:
+- Pandas EDA and visualization
 
 Keep SQL readable and grouped by business question. Add comments explaining the
 purpose of each query, the grain of the result, relevant sample-size constraints,
