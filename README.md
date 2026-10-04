@@ -79,9 +79,9 @@ DB1B-Airline-Analysis/
 - [x] Complete DB1BTicket data-quality / cleaning investigation and analytical scope
 - [x] Complete DB1BTicket baseline analysis
 - [x] Complete DB1BTicket exploratory analysis
-- [ ] Import and validate DB1BMarket
-- [ ] Import and validate DB1BCoupon
-- [ ] Define table relationships and join grain
+- [x] Import and validate DB1BMarket
+- [x] Import and validate DB1BCoupon
+- [x] Define table relationships and join grain
 - [x] Complete DB1BTicket diagnostic analysis
 - [ ] Continue analysis in Pandas
 - [ ] Create final visualizations
@@ -147,6 +147,22 @@ The diagnostic stage drills into selected exploratory patterns and tests plausib
 - Within UA + distance group 11 + round-trip, high average fares are not uniform across subsegments; some of the highest values are concentrated in specific origins, especially NJ in the displayed output.
 
 These findings are diagnostic rather than causal: they identify factors and subsegments that may help explain the observed patterns, but they do not establish cause-and-effect relationships.
+
+## Completed relational JOIN findings
+
+The relational stage validates and analyzes how DB1BTicket, DB1BMarket, and DB1BCoupon connect:
+
+- DB1BTicket has itinerary-level grain, DB1BMarket has market-level grain, and DB1BCoupon has coupon/segment-level grain.
+- Ticket -> Market is a one-to-many relationship through `itin_id`.
+- Market -> Coupon is a one-to-many relationship through `mkt_id`.
+- Ticket-Market JOIN row count matches Market row count because every Market row has a Ticket match.
+- Summing `itin_fare` after joining Ticket to Market creates double counting because itinerary fare repeats for each Market row.
+- Re-aggregating by `itin_id` restores itinerary grain; average markets per itinerary is about **1.63**.
+- `mkt_coupons` matches the number of Coupon rows per `mkt_id`; the validation query returned **0 mismatches**.
+- A three-table JOIN can safely produce Coupon/segment-level output when Ticket joins by `itin_id` and Market joins by `mkt_id`.
+- For round-trip itineraries, **HA** has the highest observed average Coupon segment distance at about **1,880.36 miles** in the displayed result.
+
+The central lesson from this stage is that JOIN correctness depends on both the key and the resulting grain. A syntactically valid JOIN can still produce analytically incorrect results if it duplicates higher-level measures.
 
 ## Analytical workflow
 
