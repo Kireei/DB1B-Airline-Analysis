@@ -43,6 +43,8 @@ Final insights and limitations
 DB1B-Airline-Analysis/
 │
 ├── data/
+│   ├── DATA_DICTIONARY.md
+│   └── samples/
 ├── sql/
 │   ├── 01_schema.sql
 │   ├── 02_data_understanding.sql
@@ -107,6 +109,29 @@ The notebook in `notebooks/01_python_eda_visualization.ipynb` validates the expo
 - coupon distribution
 - WN share in CA and TX
 - round-trip segment distance by carrier
+
+## Reproduce the project
+
+There are two ways to review this project.
+
+### Quick review
+
+1. Open the SQL files to see the analytical workflow.
+2. Inspect the small files in `data/samples/` to understand the source table structure.
+3. Use the aggregated CSV files in `outputs/`.
+4. Run `notebooks/01_python_eda_visualization.ipynb` to reproduce the charts.
+
+This path does not require the full raw DB1B dataset.
+
+### Full reproduction
+
+1. Download DB1BTicket, DB1BMarket, and DB1BCoupon for 2024 Q1-Q4 from BTS.
+2. Load the files into PostgreSQL using the schema in `sql/01_schema.sql`.
+3. Run the SQL files in order from `02_data_understanding.sql` through `07_join_analysis.sql`.
+4. Export the small aggregated query results or use the included `outputs/` files.
+5. Run the Python notebook.
+
+See `data/DATA_DICTIONARY.md` for table grain and relationship keys.
 
 ## Notes
 
