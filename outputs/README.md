@@ -1,13 +1,15 @@
 # Outputs
 
-Store only selected analysis-ready summaries that are useful for reproducing charts or presenting findings.
+This folder contains small aggregated CSV files used by the Python notebook.
 
-Avoid committing multi-million-row raw extracts.
+Files:
+- `quarter_summary.csv`
+- `distance_group_summary.csv`
+- `carrier_summary.csv`
+- `trip_type_summary.csv`
+- `coupon_summary.csv`
+- `origin_state_summary.csv`
+- `carrier_share_ca_tx.csv`
+- `segment_carrier_summary.csv`
 
-Examples:
-- quarterly_ticket_summary.csv
-- carrier_summary.csv
-- fare_distance_summary.csv
-- final_analysis_dataset.csv
-
-Large outputs should remain local and be documented instead of committed.
+These are analytical summaries, not raw DB1B extracts.
