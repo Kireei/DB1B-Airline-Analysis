@@ -120,13 +120,3 @@ U.S. Department of Transportation
 Bureau of Transportation Statistics  
 Airline Origin and Destination Survey (DB1B)
 
-## Current status
-
-- [x] Data understanding
-- [x] Data validation and cleaning investigation
-- [x] Baseline analysis
-- [x] Exploratory analysis
-- [x] Diagnostic analysis
-- [x] Relational JOIN analysis
-- [x] Python EDA and visualization
-- [x] Final insight review
