@@ -1,13 +1,13 @@
 # Notebooks
 
-Pandas notebooks will be added after the PostgreSQL validation and core SQL analysis are complete.
+This folder contains the Python part of the project.
 
-Planned use:
-- analysis-ready data loading
-- exploratory analysis
-- visualization
-- distribution analysis
-- deeper investigation of SQL findings
-- final charts for the portfolio README
+`01_python_eda_visualization.ipynb` uses small aggregated CSV files exported from PostgreSQL instead of loading the full DB1B raw tables into Pandas.
 
-SQL remains the primary tool for database validation, transformation, joins, and large-scale aggregation.
+Main tasks:
+- validate the exported analytical tables
+- create portfolio charts
+- compare SQL findings visually
+- document interpretation and limitations
+
+PostgreSQL remains the main tool for large-scale filtering, aggregation, and JOIN operations.
