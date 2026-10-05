@@ -1,41 +1,41 @@
 # DB1B Airline Analysis
 
-End-to-end data analysis portfolio project using the **U.S. Department of Transportation, Bureau of Transportation Statistics (BTS) DB1B Airline Origin & Destination Survey**.
+Portfolio project using the **U.S. Department of Transportation, Bureau of Transportation Statistics (BTS) DB1B Airline Origin and Destination Survey**.
 
-## Project goal
+The project focuses on airfare, distance, carrier behavior, trip structure, geography, and relationships between Ticket, Market, and Coupon tables.
 
-This project is designed to practice how a data analyst works with large, real-world relational data:
+## Project scope
 
-- understand table grain and business definitions
-- validate raw data before analysis
-- investigate suspicious values before deciding whether to clean or filter them
-- use PostgreSQL for large-scale SQL analysis
-- join multiple DB1B tables safely
-- use Pandas for deeper EDA and visualization
-- investigate notable patterns without overclaiming
-- communicate findings through an executive-style summary
+- Period: **2024 Q1-Q4**
+- Main tables:
+  - **DB1BTicket**: itinerary level
+  - **DB1BMarket**: market level
+  - **DB1BCoupon**: coupon or segment level
+- Main tools: PostgreSQL, pgAdmin, Python, Pandas, Matplotlib, Git, GitHub
 
-## Scope
+Raw DB1B files are not committed because the source data is very large.
 
-Current analysis period: **2024 Q1-Q4**
+## Workflow
 
-Planned core tables:
-
-- **DB1BTicket** — itinerary/ticket-level data
-- **DB1BMarket** — directional market-level data
-- **DB1BCoupon** — flight coupon/segment-level data
-
-The raw source files contain millions of records and are not committed to this repository.
-
-## Tools
-
-- PostgreSQL 18
-- pgAdmin 4
-- Python
-- Pandas
-- Matplotlib
-- Google Colab / Jupyter
-- Git & GitHub
+```text
+Raw DB1B files
+    ↓
+PostgreSQL import
+    ↓
+Data understanding and validation
+    ↓
+Baseline analysis
+    ↓
+Exploratory analysis
+    ↓
+Diagnostic analysis
+    ↓
+Relational JOIN analysis
+    ↓
+Python EDA and visualization
+    ↓
+Final insights and limitations
+```
 
 ## Repository structure
 
@@ -43,10 +43,7 @@ The raw source files contain millions of records and are not committed to this r
 DB1B-Airline-Analysis/
 │
 ├── data/
-│   └── README.md
-│
 ├── sql/
-│   ├── README.md
 │   ├── 01_schema.sql
 │   ├── 02_data_understanding.sql
 │   ├── 03_data_validation.sql
@@ -56,150 +53,80 @@ DB1B-Airline-Analysis/
 │   └── 07_join_analysis.sql
 │
 ├── notebooks/
-│   └── README.md
+│   └── 01_python_eda_visualization.ipynb
 │
 ├── outputs/
-│   └── README.md
-│
 ├── images/
-│   └── README.md
-│
-├── .gitignore
 └── README.md
 ```
 
-## Current progress
+## Main findings
 
-- [x] Download DB1BTicket 2024 Q1-Q4
-- [x] Inspect DB1BTicket schema with Pandas
-- [x] Load DB1BTicket 2024 Q1-Q4 into PostgreSQL
-- [x] Validate row distribution by quarter
-- [x] Complete DB1BTicket data understanding
-- [x] Complete DB1BTicket data validation
-- [x] Complete DB1BTicket data-quality / cleaning investigation and analytical scope
-- [x] Complete DB1BTicket baseline analysis
-- [x] Complete DB1BTicket exploratory analysis
-- [x] Import and validate DB1BMarket
-- [x] Import and validate DB1BCoupon
-- [x] Define table relationships and join grain
-- [x] Complete DB1BTicket diagnostic analysis
-- [ ] Continue analysis in Pandas
-- [ ] Create final visualizations
-- [ ] Write findings, limitations, and executive summary
-
-## Completed DB1BTicket validation findings
-
-The current 2024 DB1BTicket validation stage produced several important analytical notes:
-
-- **20,066,076 rows** were loaded across Q1-Q4.
-- The checked business columns contained **no SQL NULL values** and no negative values in the validated numeric fields.
-- **16,233 rows** have `itin_fare = 0`, approximately **0.0809%** of the dataset.
-- The same **16,233 rows** also have `fare_per_mile = 0` in the checked results.
-- **5,742 rows** have `miles_flown < 100`; the minimum observed value is 17 miles.
-- `distance` and `miles_flown` are equal for **19,612,790** rows, while **453,286** rows have `distance > miles_flown`.
-- Extreme `itin_fare` and `fare_per_mile` values are treated as investigation candidates, not automatically deleted as errors.
-- Binary flags checked in this stage use the expected 0/1 domain.
-
-### Analytical-scope decision
-
-The raw DB1BTicket table is preserved. Unusual records are documented rather than deleted without evidence. Downstream analysis can apply explicit filters when the metric requires a narrower population—for example, a paid-fare analysis can use `itin_fare > 0` while data-quality analysis retains all records.
-
-## Completed baseline findings
-
-The DB1BTicket baseline analysis provides a descriptive picture of the 2024 data:
-
-- **Q2** contains the largest share of itinerary records, at about **26.07%**.
+- The 2024 DB1BTicket table contains **20,066,076 itinerary records**.
+- Q2 has the largest share of itinerary records, while Q4 has the highest average itinerary fare at about **456.59**.
 - **WN** has the largest itinerary count.
-- Among carriers with at least **200,000** itinerary records, **DL** has the highest average itinerary fare.
-- Round-trip itinerary records are more numerous and have higher average total fare and distance than one-way records, while their average fare per mile is slightly lower.
-- **2-coupon** itineraries form the largest coupon group, with about **10.60 million** records.
-- Average itinerary fare generally increases across higher distance groups, while average fare per mile generally decreases.
-- **CA** is the origin state with the largest itinerary count, at about **2.45 million** records.
+- Round-trip itineraries are more common and have higher average total fare and distance, but slightly lower fare per mile than one-way itineraries.
+- Two-coupon itineraries form the largest coupon group, with about **52.8%** of itinerary records.
+- Average itinerary fare generally increases with distance group, while average fare per mile generally decreases.
+- **AK** has the highest average itinerary fare among origin states that meet the project minimum sample threshold.
+- WN has the largest carrier share in CA and TX across the four quarters in the exported comparison.
+- At segment level, **HA** has the highest average round-trip segment distance in the exported carrier summary.
 
-## Completed exploratory findings
+## Relational model
 
-The exploratory stage tests whether baseline patterns remain visible after segmentation:
-
-- Fare differences across quarters are relatively modest within the same distance groups.
-- Carrier average fares differ within the same distance group, but sample size varies substantially across carrier-distance segments.
-- Round-trip average fare is generally higher within many lower distance groups, while some higher groups show the opposite pattern.
-- Within the same distance group, average itinerary fare generally rises as coupon count increases.
-- **AK** has the highest average itinerary fare among origin states with at least **50,000** itinerary records.
-- For the major carriers checked (**WN, AA, DL, UA, OO**), average fare per mile declines from distance groups 1 through 3.
-- Among five major origin states, the dominant carrier by itinerary count is **WN in CA and TX, AA in FL, UA in IL, and DL in NY**.
-- One-way vs round-trip composition differs by carrier; percentage shares are more informative than raw counts for cross-carrier comparison.
-- Major carriers show broadly similar coupon-count patterns, although absolute itinerary volumes differ.
-- Among `carrier × distance_group × round_trip` segments with at least **50,000** itineraries, **UA + distance group 11 + round-trip** has the highest observed average itinerary fare.
-
-These exploratory findings identify patterns for later diagnostic analysis. They do not by themselves establish causal explanations.
-
-## Completed diagnostic findings
-
-The diagnostic stage drills into selected exploratory patterns and tests plausible explanations while keeping causal claims separate from descriptive evidence:
-
-- Round-trip records show higher average coupon counts and fare-per-mile than one-way records within the same distance groups examined.
-- At high distance groups, one-way samples are much smaller than round-trip samples; in some groups, one-way fare-per-mile is also higher.
-- AK's high average itinerary fare appears alongside relatively high average distance and coupon counts in selected segments.
-- The decline in average fare-per-mile across higher distance groups remains visible across several carriers, quarters, and trip types.
-- Within matched distance groups, HA shows higher average fare-per-mile than G4 in the segments examined, while average distance does not always move in the same direction.
-- WN has the highest observed carrier share in the CA and TX state-quarter comparisons shown when share is calculated against all carriers in the same state-quarter.
-- Two-coupon itineraries are strongly represented in several high-volume segments, especially WN round-trip records in distance groups 2-4.
-- Within UA + distance group 11 + round-trip, high average fares are not uniform across subsegments; some of the highest values are concentrated in specific origins, especially NJ in the displayed output.
-
-These findings are diagnostic rather than causal: they identify factors and subsegments that may help explain the observed patterns, but they do not establish cause-and-effect relationships.
-
-## Completed relational JOIN findings
-
-The relational stage validates and analyzes how DB1BTicket, DB1BMarket, and DB1BCoupon connect:
-
-- DB1BTicket has itinerary-level grain, DB1BMarket has market-level grain, and DB1BCoupon has coupon/segment-level grain.
-- Ticket -> Market is a one-to-many relationship through `itin_id`.
-- Market -> Coupon is a one-to-many relationship through `mkt_id`.
-- Ticket-Market JOIN row count matches Market row count because every Market row has a Ticket match.
-- Summing `itin_fare` after joining Ticket to Market creates double counting because itinerary fare repeats for each Market row.
-- Re-aggregating by `itin_id` restores itinerary grain; average markets per itinerary is about **1.63**.
-- `mkt_coupons` matches the number of Coupon rows per `mkt_id`; the validation query returned **0 mismatches**.
-- A three-table JOIN can safely produce Coupon/segment-level output when Ticket joins by `itin_id` and Market joins by `mkt_id`.
-- For round-trip itineraries, **HA** has the highest observed average Coupon segment distance at about **1,880.36 miles** in the displayed result.
-
-The central lesson from this stage is that JOIN correctness depends on both the key and the resulting grain. A syntactically valid JOIN can still produce analytically incorrect results if it duplicates higher-level measures.
-
-## Analytical workflow
+The project validated the following relationships:
 
 ```text
-Raw BTS files
-    ↓
-PostgreSQL raw tables
-    ↓
-Data understanding
-    ↓
-Data validation
-    ↓
-Data-quality investigation & analytical scope
-    ↓
-Baseline business metrics
-    ↓
-Exploratory analysis
-    ↓
-Diagnostic analysis
-    ↓
-Relational JOIN analysis
-    ↓
-Pandas EDA & visualization
-    ↓
-Insights + limitations
-    ↓
-Executive summary
+DB1BTicket
+1 row = 1 itinerary
+        |
+        | 1 to many
+        v
+DB1BMarket
+1 row = 1 market
+        |
+        | 1 to many
+        v
+DB1BCoupon
+1 row = 1 coupon or segment
 ```
+
+Important lesson from the JOIN stage: a correct join key is not enough. The output grain also needs to be understood because higher-level measures can be duplicated after a one-to-many JOIN.
+
+## Python and visualization
+
+PostgreSQL is used for the large raw tables and most aggregation work. Python uses smaller analytical CSV outputs exported from SQL.
+
+The notebook in `notebooks/01_python_eda_visualization.ipynb` validates the exported summaries and creates charts for:
+
+- quarter fare comparison
+- distance group and fare
+- distance group and fare per mile
+- carrier volume
+- one-way vs round-trip
+- coupon distribution
+- WN share in CA and TX
+- round-trip segment distance by carrier
+
+## Notes
+
+This project is mainly descriptive and diagnostic. Findings such as higher fares, carrier differences, or distance patterns are treated as associations unless the analysis provides stronger evidence.
+
+Aggregated CSV files are included only for reproducible charts. Raw multi-million-row DB1B files remain local.
 
 ## Data source
 
 U.S. Department of Transportation  
-Bureau of Transportation Statistics (BTS)  
-Airline Origin & Destination Survey (DB1B)
+Bureau of Transportation Statistics  
+Airline Origin and Destination Survey (DB1B)
 
-Raw data should be downloaded from the official BTS TranStats source. See `data/README.md` for project data-handling notes.
+## Current status
 
-## Portfolio note
-
-This repository intentionally emphasizes **reasoning and analytical workflow**, not only SQL syntax. SQL files document the questions being answered, the grain used, validation logic, analytical scope, and limitations behind each result.
+- [x] Data understanding
+- [x] Data validation and cleaning investigation
+- [x] Baseline analysis
+- [x] Exploratory analysis
+- [x] Diagnostic analysis
+- [x] Relational JOIN analysis
+- [x] Python EDA and visualization
+- [x] Final insight review
