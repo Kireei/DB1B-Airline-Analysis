@@ -9,4 +9,16 @@ Main source tables:
 - DB1BMarket
 - DB1BCoupon
 
-Raw files are intentionally not committed because they are very large. The repository contains SQL, a Python notebook, selected aggregated outputs, and project documentation.
+Raw files are intentionally not committed because they are very large.
+
+## Included samples
+
+Small sample files are included so the table structure can be inspected without downloading the full raw dataset:
+
+- `samples/sample_ticket.csv`
+- `samples/sample_market.csv`
+- `samples/sample_coupon.csv`
+
+These sample rows are for structure and grain inspection only. Full SQL results require the complete BTS DB1B files.
+
+See `DATA_DICTIONARY.md` for the table grain, relationship keys, and important columns.
