@@ -40,7 +40,8 @@ DB1B-Airline-Analysis/
 The SQL files are meant to be read in order: load the data, check it, then go from overall numbers to more specific questions. The notebook comes last and only draws charts from the SQL results.
 
 ## Main findings
-
+   ![Average fare per mile by distance group](images/distance_group_avg_fpm.png)
+   ![WN carrier share in CA and TX](images/wn_share_ca_tx.png)
 - DB1BTicket has 20,066,076 itineraries for 2024.
 - Q2 has the most itineraries. Q4 has the highest average fare, about 456.59.
 - WN has the most itineraries of any carrier.
