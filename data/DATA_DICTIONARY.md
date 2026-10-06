@@ -1,13 +1,11 @@
 # Data Dictionary
 
-This project uses three DB1B tables with different grains.
+The three DB1B tables used in this project. Each one has a different grain.
 
 ## DB1BTicket
 
 **Grain:** 1 row = 1 itinerary  
 **Main key:** `itin_id`
-
-Important columns:
 
 | Column | Meaning |
 |---|---|
@@ -30,8 +28,6 @@ Important columns:
 **Main key:** `mkt_id`  
 **Relationship key:** `itin_id`
 
-Important columns:
-
 | Column | Meaning |
 |---|---|
 | `itin_id` | Links Market to Ticket |
@@ -49,10 +45,8 @@ Important columns:
 ## DB1BCoupon
 
 **Grain:** 1 row = 1 coupon or segment  
-**Composite key used for validation:** `itin_id + mkt_id + seq_num`  
+**Composite key:** `itin_id + mkt_id + seq_num`  
 **Relationship keys:** `itin_id`, `mkt_id`
-
-Important columns:
 
 | Column | Meaning |
 |---|---|
@@ -67,7 +61,7 @@ Important columns:
 | `distance` | Segment distance |
 | `distance_group` | Segment distance bucket |
 
-## Validated relationships
+## Relationships
 
 ```text
 DB1BTicket
@@ -84,10 +78,10 @@ DB1BCoupon
 1 coupon or segment
 ```
 
-The project also checked that:
+Checked on the 2024 data (queries in `sql/07_join_analysis.sql`):
 - every Market `itin_id` has a matching Ticket
 - every Ticket `itin_id` appears in Market
 - `mkt_coupons` matches the number of Coupon rows per `mkt_id`
-- the validated Coupon composite key has no duplicate rows in the tested data
+- `itin_id + mkt_id + seq_num` has no duplicates in Coupon
 
-The sample CSV files are only small examples of the source structure. They are not intended to reproduce the full SQL results.
+The CSVs in `samples/` only show the column layout. They are too small to reproduce the SQL results.

@@ -1,8 +1,7 @@
--- DB1B Airline Analysis
--- 01_schema.sql
--- PostgreSQL raw-table schema for DB1BTicket 2024 Q1-Q4.
--- The final CSV field is an empty source-file artifact and is retained during
--- raw ingestion so the PostgreSQL column count matches the physical CSV.
+-- Raw tables for DB1BTicket, DB1BMarket and DB1BCoupon, 2024 Q1-Q4. All four
+-- quarters are loaded into the same tables.
+-- The source CSVs have an extra empty field at the end of every row;
+-- csv_extra_column is there so the column count matches on import.
 
 CREATE TABLE IF NOT EXISTS db1b_ticket (
     itin_id BIGINT,
@@ -33,6 +32,91 @@ CREATE TABLE IF NOT EXISTS db1b_ticket (
     csv_extra_column TEXT
 );
 
--- Q1-Q4 are appended into this same table.
--- Do not drop csv_extra_column until all quarterly files have been loaded
--- and the column has been validated as empty across the complete dataset.
+CREATE TABLE IF NOT EXISTS db1b_market (
+    itin_id BIGINT,
+    mkt_id BIGINT,
+    mkt_coupons INTEGER,
+    year INTEGER,
+    quarter INTEGER,
+    origin_airport_id INTEGER,
+    origin_airport_seq_id INTEGER,
+    origin_city_market_id INTEGER,
+    origin VARCHAR(10),
+    origin_country VARCHAR(10),
+    origin_state_fips INTEGER,
+    origin_state VARCHAR(10),
+    origin_state_name VARCHAR(100),
+    origin_wac INTEGER,
+    dest_airport_id INTEGER,
+    dest_airport_seq_id INTEGER,
+    dest_city_market_id INTEGER,
+    dest VARCHAR(10),
+    dest_country VARCHAR(10),
+    dest_state_fips INTEGER,
+    dest_state VARCHAR(10),
+    dest_state_name VARCHAR(100),
+    dest_wac INTEGER,
+    airport_group TEXT,
+    wac_group TEXT,
+    tk_carrier_change NUMERIC,
+    tk_carrier_group TEXT,
+    op_carrier_change NUMERIC,
+    op_carrier_group TEXT,
+    rp_carrier VARCHAR(10),
+    tk_carrier VARCHAR(10),
+    op_carrier VARCHAR(10),
+    bulk_fare NUMERIC,
+    passengers NUMERIC,
+    mkt_fare NUMERIC,
+    mkt_distance NUMERIC,
+    mkt_distance_group INTEGER,
+    mkt_miles_flown NUMERIC,
+    non_stop_miles NUMERIC,
+    itin_geo_type INTEGER,
+    mkt_geo_type INTEGER,
+    csv_extra_column TEXT
+);
+
+CREATE TABLE IF NOT EXISTS db1b_coupon (
+    itin_id BIGINT,
+    mkt_id BIGINT,
+    seq_num INTEGER,
+    coupons INTEGER,
+    year INTEGER,
+    origin_airport_id INTEGER,
+    origin_airport_seq_id INTEGER,
+    origin_city_market_id INTEGER,
+    quarter INTEGER,
+    origin VARCHAR(10),
+    origin_country VARCHAR(10),
+    origin_state_fips INTEGER,
+    origin_state VARCHAR(10),
+    origin_state_name VARCHAR(100),
+    origin_wac INTEGER,
+    dest_airport_id INTEGER,
+    dest_airport_seq_id INTEGER,
+    dest_city_market_id INTEGER,
+    dest VARCHAR(10),
+    dest_country VARCHAR(10),
+    dest_state_fips INTEGER,
+    dest_state VARCHAR(10),
+    dest_state_name VARCHAR(100),
+    dest_wac INTEGER,
+    break_flag TEXT,
+    coupon_type VARCHAR(20),
+    tk_carrier VARCHAR(10),
+    op_carrier VARCHAR(10),
+    rp_carrier VARCHAR(10),
+    passengers NUMERIC,
+    fare_class VARCHAR(20),
+    distance NUMERIC,
+    distance_group INTEGER,
+    gateway TEXT,
+    itin_geo_type INTEGER,
+    coupon_geo_type INTEGER,
+    csv_extra_column TEXT
+);
+
+-- Don't drop csv_extra_column until all four quarters are loaded and the
+-- column has been checked to be empty (for db1b_ticket, that check is
+-- section C of 03_data_validation.sql).

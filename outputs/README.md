@@ -1,8 +1,7 @@
 # Outputs
 
-This folder contains small aggregated CSV files used by the Python notebook.
+Summary CSVs exported from PostgreSQL and used by the notebook:
 
-Files:
 - `quarter_summary.csv`
 - `distance_group_summary.csv`
 - `carrier_summary.csv`
@@ -12,4 +11,4 @@ Files:
 - `carrier_share_ca_tx.csv`
 - `segment_carrier_summary.csv`
 
-These are analytical summaries, not raw DB1B extracts.
+Aggregated results only, no raw DB1B rows.

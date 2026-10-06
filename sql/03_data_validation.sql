@@ -1,23 +1,14 @@
--- DB1B Airline Analysis
--- 03_data_validation.sql
---
--- Purpose:
--- Validate completeness, duplication, ranges, cross-column consistency, and
--- potentially anomalous values before using DB1BTicket for business analysis.
---
--- Analytical principle:
--- Suspicious or extreme values are not automatically removed. They are first
--- investigated because unusual data can still be valid.
---
--- Scope:
--- U.S. Department of Transportation, BTS DB1B Ticket 2024 Q1-Q4.
+-- Data quality checks on db1b_ticket (2024 Q1-Q4): NULLs, ranges, zero fares,
+-- short distances, outliers and flag values.
+-- Nothing is deleted here. Unusual rows are noted and, where needed, filtered
+-- in the analysis queries.
 
 
 -- ============================================================
--- A. CORE DATA-QUALITY CHECKS
+-- A. Basic checks
 -- ============================================================
 
--- 1) NULL profile for the 25 business columns
+-- 1) NULL count per column
 SELECT
     COUNT(*) - COUNT(itin_id) AS itin_id_null,
     COUNT(*) - COUNT(coupons) AS coupons_null,
@@ -46,11 +37,10 @@ SELECT
     COUNT(*) - COUNT(itin_geo_type) AS itin_geo_type_null
 FROM db1b_ticket;
 
--- Result:
--- All checked business columns returned 0 SQL NULL values.
+-- 0 NULLs in all 25 columns.
 
 
--- 2) Numeric range checks
+-- 2) Min / max of the numeric columns
 SELECT
     MIN(coupons) AS min_coupons,
     MAX(coupons) AS max_coupons,
@@ -70,22 +60,20 @@ SELECT
     MAX(miles_flown) AS max_miles_flown
 FROM db1b_ticket;
 
--- Observed values:
 -- coupons:       1 to 13
 -- year:          2024 to 2024
 -- quarter:       1 to 4
--- fare_per_mile: 0 to approximately 176.463
--- itin_fare:     0 to approximately 49,519
+-- fare_per_mile: 0 to 174.6450
+-- itin_fare:     0 to 46,510
 -- passengers:    1 to 992
 -- distance:      17 to 31,662
 -- miles_flown:   17 to 26,472
 --
--- Interpretation:
--- Very short distances, zero fares, high itinerary fares, and high passenger
--- counts are investigation candidates rather than automatic errors.
+-- The zero fares, very short distances and the highest fares are looked at
+-- in section B.
 
 
--- 3) Negative-value checks
+-- 3) Negative values
 SELECT
     COUNT(CASE WHEN coupons < 0 THEN 1 END) AS negative_coupons,
     COUNT(CASE WHEN year < 0 THEN 1 END) AS negative_year,
@@ -97,15 +85,14 @@ SELECT
     COUNT(CASE WHEN miles_flown < 0 THEN 1 END) AS negative_miles_flown
 FROM db1b_ticket;
 
--- Result:
--- No negative values were found in the checked numeric fields.
+-- None.
 
 
 -- ============================================================
--- B. DATA CLEANING INVESTIGATION & ANALYTICAL SCOPE
+-- B. Unusual values
 -- ============================================================
 
--- B1) How many rows have itin_fare = 0?
+-- B1) Rows with itin_fare = 0
 SELECT COUNT(*) AS itin_fare_zero
 FROM db1b_ticket
 WHERE itin_fare = 0;
@@ -115,16 +102,10 @@ SELECT
         AS itin_fare_zero_pct
 FROM db1b_ticket;
 
--- Results:
--- 16,233 rows
--- Approximately 0.0809% of the 20,066,076 DB1BTicket rows.
---
--- Interpretation:
--- Zero-fare records are a very small part of the dataset. They are documented
--- as a data-quality note, not automatically treated as errors.
+-- 16,233 rows, about 0.0809% of the table.
 
 
--- B2) Inspect the characteristics of zero-fare records
+-- B2) What do the zero-fare rows look like?
 SELECT
     itin_id,
     quarter,
@@ -140,50 +121,33 @@ WHERE itin_fare = 0
 ORDER BY quarter, itin_id
 LIMIT 100;
 
--- Interpretation:
--- This query is used to profile the zero-fare subset across carrier, quarter,
--- trip type, passenger count, and distance. The available fields do not by
--- themselves establish why the fare is zero.
+-- These columns don't show why the fare is zero.
 
 
--- B3) Do all itin_fare = 0 records also have fare_per_mile = 0?
-
--- Search for a counterexample.
+-- B3) Do zero-fare rows also have fare_per_mile = 0?
 SELECT COUNT(*) AS zero_fare_nonzero_fpm
 FROM db1b_ticket
 WHERE itin_fare = 0
   AND fare_per_mile <> 0;
 
--- Confirm the both-zero subset.
 SELECT COUNT(*) AS both_zero
 FROM db1b_ticket
 WHERE itin_fare = 0
   AND fare_per_mile = 0;
 
--- Result:
--- both_zero = 16,233, equal to the full itin_fare = 0 count.
--- No counterexample was observed in the checked results.
---
--- Interpretation:
--- In the 2024 DB1BTicket data used here, zero itinerary fare and zero fare per
--- mile occur together. This demonstrates cross-column consistency, but it
--- does not explain the business reason for the zero values.
+-- Yes. both_zero = 16,233, the same count as B1, and no counterexample.
 
 
--- B4) How many rows have fare_per_mile = 0?
+-- B4) Rows with fare_per_mile = 0
 SELECT COUNT(*) AS fare_per_mile_zero
 FROM db1b_ticket
 WHERE fare_per_mile = 0;
 
--- Result:
--- 16,233 rows.
---
--- Interpretation:
--- The count matches itin_fare = 0. For paid-fare analysis these rows may be
--- excluded with an explicit WHERE filter, while remaining preserved in raw data.
+-- 16,233 rows, matching B1. Queries about paid fares filter these out with
+-- WHERE; the rows stay in the raw table.
 
 
--- B5) Inspect very short flown distances
+-- B5) Very short flown distances
 SELECT COUNT(*) AS short_distance_rows
 FROM db1b_ticket
 WHERE miles_flown < 100;
@@ -203,13 +167,8 @@ WHERE miles_flown < 100
 ORDER BY miles_flown ASC, itin_fare DESC
 LIMIT 20;
 
--- Results:
--- 5,742 rows have miles_flown < 100.
--- Minimum observed miles_flown = 17.
---
--- Interpretation:
--- Very short distances are unusual and worth investigating, but distance alone
--- is not sufficient evidence that a record is invalid.
+-- 5,742 rows are under 100 miles; the shortest is 17.
+-- Kept: a short distance alone doesn't make a row wrong.
 
 
 -- B6) Are distance and miles_flown always the same?
@@ -219,18 +178,14 @@ SELECT
     COUNT(*) FILTER (WHERE distance < miles_flown) AS distance_smaller
 FROM db1b_ticket;
 
--- Results:
 -- distance = miles_flown : 19,612,790
 -- distance > miles_flown :    453,286
 -- distance < miles_flown :          0
 --
--- Interpretation:
--- The two measures are equal for most records, but they are not universally
--- identical. Because the fields have different definitions, downstream
--- analysis should select the metric that matches the business question.
+-- Not interchangeable, so each query has to pick the one it actually needs.
 
 
--- B7) Candidate itinerary-fare outliers
+-- B7) Highest itinerary fares
 SELECT
     itin_id,
     itin_fare,
@@ -244,14 +199,10 @@ FROM db1b_ticket
 ORDER BY itin_fare DESC
 LIMIT 10;
 
--- Interpretation:
--- The top records contain itinerary fares far above typical values, with varied
--- distances and coupon counts. These are investigation candidates, not proven
--- data errors. Fare can be affected by factors not yet represented in this
--- stage of the analysis.
+-- Far above typical fares, with mixed distances and coupon counts. Kept.
 
 
--- B8) Candidate fare-per-mile outliers
+-- B8) Highest fare per mile
 SELECT
     itin_id,
     fare_per_mile,
@@ -264,13 +215,10 @@ FROM db1b_ticket
 ORDER BY fare_per_mile DESC
 LIMIT 10;
 
--- Interpretation:
--- In the top-10 profile, extreme fare_per_mile values often combine relatively
--- high itinerary fares with short distances. This top-10 inspection is not
--- sufficient to claim correlation or causality.
+-- Mostly fairly high fares on short distances.
 
 
--- B9) Validate categorical flags
+-- B9) Flag values, including dollar_cred
 SELECT 'round_trip' AS column_name,
        CAST(round_trip AS VARCHAR) AS value,
        COUNT(*) AS total_rows
@@ -302,37 +250,23 @@ FROM db1b_ticket
 GROUP BY dollar_cred
 ORDER BY column_name, value;
 
--- Result:
--- The checked flags use values 0 and 1.
---
--- Interpretation:
--- No out-of-domain binary values were observed in this scope.
+-- All four only contain 0 and 1.
 
 
--- B10) Analytical-scope decision
+-- B10) Decisions for the analysis
 --
--- 1. Preserve the raw table. No row is deleted only because it is unusual.
--- 2. Keep itin_fare = 0 and fare_per_mile = 0 in raw data.
---    For paid-fare metrics, filter them explicitly in the analytical query.
--- 3. Keep short-distance records unless additional evidence demonstrates an error.
--- 4. Treat distance and miles_flown as separate measures with different meanings.
--- 5. Treat extreme fare and fare_per_mile records as investigation candidates.
--- 6. Use the validated 0/1 flags as analytical dimensions when relevant.
---
--- Conclusion:
--- Bagian B did not find strong evidence requiring permanent removal of records
--- from raw DB1BTicket. The output of this stage is an analytical scope:
--- documented anomalies, validated relationships, and explicit filters for
--- downstream metrics.
+-- - The raw table stays as it is; no rows are deleted.
+-- - Zero-fare rows are filtered with WHERE in queries about paid fares.
+-- - Short-distance rows and the extreme fares stay in.
+-- - distance and miles_flown are treated as two different measures.
 
 
 -- ============================================================
--- C. INGESTION ARTIFACT CHECK
+-- C. csv_extra_column
 -- ============================================================
 
--- The source CSV contains an extra empty physical field, imported as
--- csv_extra_column so PostgreSQL matches the source column count.
--- Validate this column before dropping it from a cleaned table/view.
+-- The extra empty CSV field from 01_schema.sql. Check that it is empty before
+-- dropping it.
 
 SELECT
     COUNT(*) AS total_rows,
