@@ -5,7 +5,6 @@ data/raw/
 *.7z
 
 # Large generated outputs
-outputs/*.csv
 outputs/*.parquet
 outputs/*.feather
 
