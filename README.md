@@ -31,7 +31,7 @@ DB1B-Airline-Analysis/
 │   ├── 06_diagnostic_analysis.sql
 │   └── 07_join_analysis.sql
 ├── notebooks/
-│   └── 01_python_eda_visualization.ipynb
+│   └── Python_EDA_Visualization.ipynb
 ├── outputs/
 ├── images/
 └── README.md
@@ -82,7 +82,7 @@ PostgreSQL does the work on the raw tables. The notebook reads the summary CSVs 
 
 ## Running it
 
-To redraw the charts, run `notebooks/01_python_eda_visualization.ipynb`. It only needs the CSVs in `outputs/`, not the raw data.
+To redraw the charts, run `notebooks/Python_EDA_Visualization.ipynb`. It only needs the CSVs in `outputs/`, not the raw data.
 
 To rerun the whole analysis:
 
