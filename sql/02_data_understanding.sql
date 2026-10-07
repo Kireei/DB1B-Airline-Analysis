@@ -1,6 +1,3 @@
--- First look at db1b_ticket (2024 Q1-Q4): row counts, grain, and the values
--- in the main categorical columns.
-
 -- 1) Total rows
 SELECT COUNT(*) AS total_data
 FROM db1b_ticket;
