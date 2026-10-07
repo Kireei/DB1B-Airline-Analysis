@@ -1,7 +1,5 @@
--- Raw tables for DB1BTicket, DB1BMarket and DB1BCoupon, 2024 Q1-Q4. All four
--- quarters are loaded into the same tables.
--- The source CSVs have an extra empty field at the end of every row;
--- csv_extra_column is there so the column count matches on import.
+-- Raw tables for DB1BTicket, DB1BMarket and DB1BCoupon, 2024 Q1-Q4. 
+-- Sources from CSV DB1B Airline
 
 CREATE TABLE IF NOT EXISTS db1b_ticket (
     itin_id BIGINT,
@@ -116,7 +114,3 @@ CREATE TABLE IF NOT EXISTS db1b_coupon (
     coupon_geo_type INTEGER,
     csv_extra_column TEXT
 );
-
--- Don't drop csv_extra_column until all four quarters are loaded and the
--- column has been checked to be empty (for db1b_ticket, that check is
--- section C of 03_data_validation.sql).
