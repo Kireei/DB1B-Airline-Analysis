@@ -1,12 +1,6 @@
--- Data quality checks on db1b_ticket (2024 Q1-Q4): NULLs, ranges, zero fares,
--- short distances, outliers and flag values.
--- Nothing is deleted here. Unusual rows are noted and, where needed, filtered
--- in the analysis queries.
+-- Data quality checks on db1b_ticket (2024 Q1-Q4): NULLs, ranges, zero fares, short distances, outliers, and flag values.
 
-
--- ============================================================
 -- A. Basic checks
--- ============================================================
 
 -- 1) NULL count per column
 SELECT
@@ -40,7 +34,7 @@ FROM db1b_ticket;
 -- 0 NULLs in all 25 columns.
 
 
--- 2) Min / max of the numeric columns
+-- 2) Min / Max of the numeric columns
 SELECT
     MIN(coupons) AS min_coupons,
     MAX(coupons) AS max_coupons,
@@ -85,12 +79,7 @@ SELECT
     COUNT(CASE WHEN miles_flown < 0 THEN 1 END) AS negative_miles_flown
 FROM db1b_ticket;
 
--- None.
-
-
--- ============================================================
 -- B. Unusual values
--- ============================================================
 
 -- B1) Rows with itin_fare = 0
 SELECT COUNT(*) AS itin_fare_zero
@@ -143,9 +132,7 @@ SELECT COUNT(*) AS fare_per_mile_zero
 FROM db1b_ticket
 WHERE fare_per_mile = 0;
 
--- 16,233 rows, matching B1. Queries about paid fares filter these out with
--- WHERE; the rows stay in the raw table.
-
+-- 16,233 rows, matching B1.
 
 -- B5) Very short flown distances
 SELECT COUNT(*) AS short_distance_rows
@@ -168,7 +155,6 @@ ORDER BY miles_flown ASC, itin_fare DESC
 LIMIT 20;
 
 -- 5,742 rows are under 100 miles; the shortest is 17.
--- Kept: a short distance alone doesn't make a row wrong.
 
 
 -- B6) Are distance and miles_flown always the same?
@@ -181,8 +167,6 @@ FROM db1b_ticket;
 -- distance = miles_flown : 19,612,790
 -- distance > miles_flown :    453,286
 -- distance < miles_flown :          0
---
--- Not interchangeable, so each query has to pick the one it actually needs.
 
 
 -- B7) Highest itinerary fares
@@ -255,20 +239,9 @@ ORDER BY column_name, value;
 
 -- B10) Decisions for the analysis
 --
--- - The raw table stays as it is; no rows are deleted.
+-- - No rows are deleted.
 -- - Zero-fare rows are filtered with WHERE in queries about paid fares.
 -- - Short-distance rows and the extreme fares stay in.
 -- - distance and miles_flown are treated as two different measures.
 
 
--- ============================================================
--- C. csv_extra_column
--- ============================================================
-
--- The extra empty CSV field from 01_schema.sql. Check that it is empty before
--- dropping it.
-
-SELECT
-    COUNT(*) AS total_rows,
-    COUNT(csv_extra_column) AS non_null_extra_column
-FROM db1b_ticket;
