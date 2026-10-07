@@ -70,8 +70,6 @@ Joining Ticket to Market repeats `itin_fare` once per market, so summing it afte
 
 ## Charts
 
-PostgreSQL does the work on the raw tables. The notebook reads the summary CSVs in `outputs/` and plots:
-
 - average fare by quarter
 - average fare by distance group
 - fare per mile by distance group
@@ -81,23 +79,6 @@ PostgreSQL does the work on the raw tables. The notebook reads the summary CSVs 
 - WN share in CA and TX
 - round-trip segment distance by carrier
 
-## Running it
-
-To redraw the charts, run `notebooks/Python_EDA_Visualization.ipynb`. It only needs the CSVs in `outputs/`, not the raw data.
-
-To rerun the whole analysis:
-
-1. Download DB1BTicket, DB1BMarket and DB1BCoupon for 2024 Q1-Q4 from BTS.
-2. Create the tables with `sql/01_schema.sql` and import the files into PostgreSQL.
-3. Run `02_data_understanding.sql` through `07_join_analysis.sql` in order.
-4. Export the summary results to `outputs/`, or use the files already there.
-5. Run the notebook.
-
-Column descriptions and keys are in `data/DATA_DICTIONARY.md`.
-
-## Notes
-
-The analysis is descriptive. Differences between carriers, states or trip types are patterns in the 2024 data, not proof of what causes them.
 
 ## Data source
 
